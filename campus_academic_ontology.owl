@@ -2,14 +2,16 @@
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:base="https://example.org/hinton/newstudent">
   <owl:Ontology rdf:about="https://example.org/hinton/newstudent">
     <rdfs:label xml:lang="en">Campus and academic information ontology</rdfs:label>
-    <owl:versionInfo>2.7</owl:versionInfo>
+    <owl:versionInfo>2.8</owl:versionInfo>
     <rdfs:comment xml:lang="en">The personnel hierarchy includes academic ranks, teaching and non-teaching roles, and student affairs counselors. These describe the current context; update role assertions when duties change. Academic rank classes are siblings and do not imply one another. Student classes and student leadership roles are outside the current scope.</rdfs:comment>
-    <rdfs:comment xml:lang="en">An English ontology adapted from the supplied class and property design and its generation script. Activity scheduling, equipment provision and facility matching are deferred. Academic years, semesters and time periods are retained. Direct properties replace intermediate module, offering and course leadership records. No illustrative individuals are included.</rdfs:comment>
+    <rdfs:comment xml:lang="en">An English ontology adapted from the supplied class and property design and its generation script. Room equipment provision is included. Activity scheduling and facility matching remain deferred. Academic years, semesters and time periods are retained. Direct properties replace intermediate module, offering and course leadership records. No illustrative individuals are included.</rdfs:comment>
     <rdfs:comment xml:lang="en">The namespace is the example namespace recommended in the source design. Missing property values remain unknown under the open-world assumption. Cardinality axioms express logical constraints, not data-entry completeness checks. Date ordering and assessment-weight totals require application or data validation.</rdfs:comment>
     <dcterms:source xml:lang="en">Supplied class and property design document; build_document.py; fonts.conf (rendering configuration only).</dcterms:source>
-    <rdfs:comment xml:lang="en">The 30 additional data properties adopted in version 2.4 are retained. Version 2.7 extends the Place branch using the class tables in design document version 1.3, bringing the data property count to 90. English labels and comments, domain unions, identifiers and existing non-spatial reasoning axioms are retained.</rdfs:comment>
+    <rdfs:comment xml:lang="en">The 30 additional data properties adopted in version 2.4 are retained. Version 2.8 adds shared Place properties, inverse location relationships and room equipment provision. There are 62 named classes, 30 named object properties and 106 named data properties. English labels and comments, identifiers and existing non-spatial reasoning axioms are retained.</rdfs:comment>
     <dcterms:source xml:lang="en">University freshman ontology class and property design, version 1.3, 28 October 2026; Place class tables and spatial, booking and accessibility sections.</dcterms:source>
     <rdfs:comment xml:lang="en">The Place update covers all 35 classes listed in the version 1.3 location class tables. The existing SeminarRoom class is retained as an additional location class. Legacy class names appearing only in older examples or narrative text are not reintroduced. Existing non-Place classes and properties are preserved. Accessibility remains a room data property; outdoor grounds are not buildings.</rdfs:comment>
+    <dcterms:source xml:lang="en">Place property design, 28 October 2026, based on the version 1.3 class design and the room equipment questions Q8 and Q9.</dcterms:source>
+    <rdfs:comment xml:lang="en">Shared location properties are defined on Place and inherited by its subclasses. Existing specialised property names are retained as subproperties where their meanings align. Supported sports use a shared string vocabulary; booking and opening-hour fields describe policy, not live availability. The equipment support classes are not subclasses of Place. No illustrative individuals are included.</rdfs:comment>
   </owl:Ontology>
   <owl:Class rdf:about="https://example.org/hinton/newstudent#Person">
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
@@ -144,6 +146,13 @@
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#TeachingRoom"/>
     <rdfs:label xml:lang="en">Laboratory</rdfs:label>
     <rdfs:comment xml:lang="en">A laboratory used for experimental or practical teaching in this version.</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#requiresSafetyInduction"/>
+        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
   </owl:Class>
   <owl:Class rdf:about="https://example.org/hinton/newstudent#ComputerLaboratory">
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#Laboratory"/>
@@ -372,6 +381,7 @@
       <rdf:Description rdf:about="https://example.org/hinton/newstudent#locatedInBuilding"/>
       <rdf:Description rdf:about="https://example.org/hinton/newstudent#locatedOnCampus"/>
     </owl:propertyChainAxiom>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#spatiallyPartOf"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#hasStudySpace">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#LibraryBuilding"/>
@@ -383,6 +393,7 @@
         <owl:inverseOf rdf:resource="https://example.org/hinton/newstudent#locatedInBuilding"/>
       </owl:ObjectProperty>
     </rdfs:subPropertyOf>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#hasRoom"/>
   </owl:ObjectProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#fullName">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Person"/>
@@ -552,42 +563,45 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Campus name</rdfs:label>
     <rdfs:comment xml:lang="en">The name of the campus.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeName"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#buildingName">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Building name</rdfs:label>
     <rdfs:comment xml:lang="en">The name of the building.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeName"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#buildingCode">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Building code</rdfs:label>
     <rdfs:comment xml:lang="en">The code of the building.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeCode"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#postalAddress">
-    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Postal address</rdfs:label>
-    <rdfs:comment xml:lang="en">The postal address of the building.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:comment xml:lang="en">The public postal address of a place where applicable. A room can share its containing building address; do not infer an address automatically from location alone.</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#mapURL">
-    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
     <rdfs:label xml:lang="en">Map url</rdfs:label>
-    <rdfs:comment xml:lang="en">An official map URL for the building.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:comment xml:lang="en">An official map link for a place, including campuses, buildings, rooms or outdoor spaces.</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#latitude">
-    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
     <rdfs:label xml:lang="en">Latitude</rdfs:label>
-    <rdfs:comment xml:lang="en">The latitude of the building, in degrees from -90 to 90.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:comment xml:lang="en">A representative latitude of a place, in degrees from -90 to 90. A room-specific coordinate is optional and is not automatically inherited from its building.</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#longitude">
-    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
     <rdfs:label xml:lang="en">Longitude</rdfs:label>
-    <rdfs:comment xml:lang="en">The longitude of the building, in degrees from -180 to 180.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:comment xml:lang="en">A representative longitude of a place, in degrees from -180 to 180. A room-specific coordinate is optional and is not automatically inherited from its building.</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#hasLift">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
@@ -606,6 +620,7 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Room id</rdfs:label>
     <rdfs:comment xml:lang="en">A room identifier intended to be unique across buildings; uniqueness requires data validation.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeCode"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#roomNumber">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Room"/>
@@ -836,12 +851,14 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Campus address</rdfs:label>
     <rdfs:comment xml:lang="en">A public address for the campus.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#postalAddress"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#campusMapURL">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Campus"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
     <rdfs:label xml:lang="en">Campus map url</rdfs:label>
     <rdfs:comment xml:lang="en">The official campus map page.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#mapURL"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#openingHours">
     <rdfs:domain>
@@ -855,18 +872,21 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Opening hours</rdfs:label>
     <rdfs:comment xml:lang="en">Published opening hours; exceptions may need separate maintenance.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#openingHoursText"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#roomName">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Room"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Room name</rdfs:label>
     <rdfs:comment xml:lang="en">A descriptive room name in addition to roomID and roomNumber.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeName"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#roomAreaSquareMetres">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Room"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
     <rdfs:label xml:lang="en">Room area square metres</rdfs:label>
     <rdfs:comment xml:lang="en">Usable room area in square metres; non-negative.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#areaSquareMetres"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#hasHearingLoop">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Room"/>
@@ -952,6 +972,13 @@
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#Building"/>
     <rdfs:label xml:lang="en">Student residence</rdfs:label>
     <rdfs:comment xml:lang="en">A building primarily used as student accommodation.</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#residentCapacity"/>
+        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
   </owl:Class>
   <owl:Class rdf:about="https://example.org/hinton/newstudent#DiningBuilding">
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#Building"/>
@@ -962,6 +989,13 @@
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#Room"/>
     <rdfs:label xml:lang="en">Teaching room</rdfs:label>
     <rdfs:comment xml:lang="en">A room directly used for classroom teaching.</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#hasFixedSeating"/>
+        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
   </owl:Class>
   <owl:Class rdf:about="https://example.org/hinton/newstudent#Classroom">
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#TeachingRoom"/>
@@ -1059,6 +1093,13 @@
         <owl:onClass rdf:resource="https://example.org/hinton/newstudent#Campus"/>
       </owl:Restriction>
     </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#hasFloodlighting"/>
+        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
   </owl:Class>
   <owl:Class rdf:about="https://example.org/hinton/newstudent#SportsGround">
     <rdfs:subClassOf rdf:resource="https://example.org/hinton/newstudent#OutdoorSpace"/>
@@ -1092,30 +1133,41 @@
     </rdfs:subPropertyOf>
     <rdfs:label xml:lang="en">Has library room</rdfs:label>
     <rdfs:comment xml:lang="en">A room contained in a library building. This entails that the room is locatedInBuilding that library building.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#hasRoom"/>
   </owl:ObjectProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#libraryServiceURL">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#LibraryBuilding"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
     <rdfs:label xml:lang="en">Library service URL</rdfs:label>
     <rdfs:comment xml:lang="en">The library service and usage information page.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#serviceURL"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#spaceName">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#OutdoorSpace"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Space name</rdfs:label>
     <rdfs:comment xml:lang="en">The name of an outdoor space such as a sports ground, track or court.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeName"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#spaceCode">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#OutdoorSpace"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Space code</rdfs:label>
     <rdfs:comment xml:lang="en">An identifier distinguishing outdoor spaces.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#placeCode"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#surfaceType">
-    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#OutdoorSpace"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Surface type</rdfs:label>
-    <rdfs:comment xml:lang="en">The surface material, such as grass, artificial turf or a synthetic sports surface.</rdfs:comment>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#Room"/>
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#OutdoorSpace"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:comment xml:lang="en">The surface material of a room or outdoor space, such as wood, grass or a synthetic sports surface. The domain is one union expression.</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#areaSquareMetres">
     <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
@@ -1140,5 +1192,196 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">Accessibility note</rdfs:label>
     <rdfs:comment xml:lang="en">Verified details of entrances, routes, lifts, doorway limitations and evidence. This is not a comprehensive accessibility certification.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:Class rdf:about="https://example.org/hinton/newstudent#EquipmentType">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:label xml:lang="en">Equipment type</rdfs:label>
+    <rdfs:comment xml:lang="en">A controlled equipment category, such as computer or projector. A category is represented by an individual of this class, not by a count or a physical room.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://example.org/hinton/newstudent#EquipmentProvision">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:label xml:lang="en">Equipment provision</rdfs:label>
+    <rdfs:comment xml:lang="en">A current record linking exactly one room to exactly one equipment category and its non-negative quantity. Use separate records for different rooms or equipment categories; changes over time require separate snapshots or a later temporal extension.</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#equipmentType"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+        <owl:onClass rdf:resource="https://example.org/hinton/newstudent#EquipmentType"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#provisionForRoom"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+        <owl:onClass rdf:resource="https://example.org/hinton/newstudent#Room"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="https://example.org/hinton/newstudent#quantity"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#containsPlace">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:label xml:lang="en">Contains place</rdfs:label>
+    <rdfs:comment xml:lang="en">The inverse of transitive spatiallyPartOf. Contains a place directly or indirectly; do not count these values as only direct children.</rdfs:comment>
+    <owl:inverseOf rdf:resource="https://example.org/hinton/newstudent#spatiallyPartOf"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#hasRoom">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Building"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#Room"/>
+    <rdfs:label xml:lang="en">Has room</rdfs:label>
+    <rdfs:comment xml:lang="en">The inverse of locatedInBuilding: an individually identifiable room directly contained in a building.</rdfs:comment>
+    <owl:inverseOf rdf:resource="https://example.org/hinton/newstudent#locatedInBuilding"/>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#containsPlace"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#hasCampusPlace">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Campus"/>
+    <rdfs:range>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#Building"/>
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#OutdoorSpace"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:range>
+    <rdfs:label xml:lang="en">Has campus place</rdfs:label>
+    <rdfs:comment xml:lang="en">The inverse of locatedOnCampus. Relates a campus to its buildings or outdoor spaces; this does not include rooms as direct campus children.</rdfs:comment>
+    <owl:inverseOf rdf:resource="https://example.org/hinton/newstudent#locatedOnCampus"/>
+    <rdfs:subPropertyOf rdf:resource="https://example.org/hinton/newstudent#containsPlace"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#managedBy">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#Organisation"/>
+    <rdfs:label xml:lang="en">Managed by</rdfs:label>
+    <rdfs:comment xml:lang="en">An organisation responsible for operating or managing a place. Multiple managing organisations are allowed. This is distinct from spatial containment.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#hasEquipmentProvision">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Room"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#EquipmentProvision"/>
+    <rdfs:label xml:lang="en">Has equipment provision</rdfs:label>
+    <rdfs:comment xml:lang="en">A room-specific equipment category and quantity record. Counts for different equipment types are kept in separate records.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#provisionForRoom">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#EquipmentProvision"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#Room"/>
+    <rdfs:label xml:lang="en">Provision for room</rdfs:label>
+    <rdfs:comment xml:lang="en">The room described by an equipment provision record; inverse of hasEquipmentProvision.</rdfs:comment>
+    <owl:inverseOf rdf:resource="https://example.org/hinton/newstudent#hasEquipmentProvision"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://example.org/hinton/newstudent#equipmentType">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#EquipmentProvision"/>
+    <rdfs:range rdf:resource="https://example.org/hinton/newstudent#EquipmentType"/>
+    <rdfs:label xml:lang="en">Equipment type</rdfs:label>
+    <rdfs:comment xml:lang="en">The single equipment category counted by a provision record.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#placeName">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Place name</rdfs:label>
+    <rdfs:comment xml:lang="en">A human-readable name of a place. Names do not identify places uniquely.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#placeCode">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Place code</rdfs:label>
+    <rdfs:comment xml:lang="en">A code for a place within its documented naming scope. Codes need not be globally unique across campuses or kinds of place.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#locationDescription">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Location description</rdfs:label>
+    <rdfs:comment xml:lang="en">A textual wayfinding description such as the entrance to use or the side of a square. It does not replace formal location relationships.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#placeContactEmail">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Place contact email</rdfs:label>
+    <rdfs:comment xml:lang="en">A public service contact email for a place. Do not reuse the Person-domain emailAddress property for places.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#placeContactTelephone">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Place contact telephone</rdfs:label>
+    <rdfs:comment xml:lang="en">A public service telephone number for a place; preserve prefixes and leading zeroes.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#accessPolicy">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Access policy</rdfs:label>
+    <rdfs:comment xml:lang="en">Published access conditions such as card access, opening restrictions or safety requirements. This text is not an automated eligibility rule.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#serviceURL">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Place"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label xml:lang="en">Service URL</rdfs:label>
+    <rdfs:comment xml:lang="en">An official service information page for the place, distinct from its map or booking page.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#hasFixedSeating">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#TeachingRoom"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label xml:lang="en">Has fixed seating</rdfs:label>
+    <rdfs:comment xml:lang="en">Whether the teaching room has fixed rather than freely movable seating in the current recorded configuration. Missing means unknown.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#requiresSafetyInduction">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#Laboratory"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label xml:lang="en">Requires safety induction</rdfs:label>
+    <rdfs:comment xml:lang="en">Whether users must complete a safety induction before using this laboratory. Missing means unknown; true does not mean a given student has completed the induction.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#collectionDescription">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#BookStackRoom"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Collection description</rdfs:label>
+    <rdfs:comment xml:lang="en">The subject scope or categories of resources held in a book stack room. It is not an item-level catalogue.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#supportedSport">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#SportsBuilding"/>
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#SportsRoom"/>
+          <rdf:Description rdf:about="https://example.org/hinton/newstudent#OutdoorSpace"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Supported sport</rdfs:label>
+    <rdfs:comment xml:lang="en">A supported sport or activity name. Multiple values may be recorded using a shared controlled vocabulary. It does not imply equipment availability or current booking availability.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#hasFloodlighting">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#OutdoorSpace"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label xml:lang="en">Has floodlighting</rdfs:label>
+    <rdfs:comment xml:lang="en">Whether an outdoor space has floodlighting. This does not imply that it is open at night. Missing means unknown.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#residentCapacity">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#StudentResidence"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+    <rdfs:label xml:lang="en">Resident capacity</rdfs:label>
+    <rdfs:comment xml:lang="en">The current permitted number of residents in a student residence building. This is not the Room-domain capacity property.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#cateringInformation">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#DiningBuilding"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Catering information</rdfs:label>
+    <rdfs:comment xml:lang="en">Published meal types or dietary-service information. Link to current details using serviceURL.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#equipmentName">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#EquipmentType"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Equipment name</rdfs:label>
+    <rdfs:comment xml:lang="en">The display name of an equipment category.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://example.org/hinton/newstudent#quantity">
+    <rdfs:domain rdf:resource="https://example.org/hinton/newstudent#EquipmentProvision"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+    <rdfs:label xml:lang="en">Quantity</rdfs:label>
+    <rdfs:comment xml:lang="en">The non-negative number of items of the category held in the room for this provision record. A zero count does not qualify as available equipment.</rdfs:comment>
   </owl:DatatypeProperty>
 </rdf:RDF>
